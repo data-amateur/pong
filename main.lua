@@ -103,6 +103,8 @@ function love.load()
     ball = Ball(VIRTUAL_WIDTH / 2 - 2, VIRTUAL_HEIGHT / 2 - 2, 4, 4)
 
     gameState = 'start'
+    ai_1_enabled = false
+    ai_2_enabled = false
 end
 
 --[[
@@ -206,21 +208,92 @@ function love.update(dt)
     end
 
     -- player 1 movement
-    if love.keyboard.isDown('w') then
-        player1.dy = -PADDLE_SPEED
-    elseif love.keyboard.isDown('s') then
-        player1.dy = PADDLE_SPEED
+    if ai_1_enabled == false then
+        if love.keyboard.isDown('w') then
+            player1.dy = -PADDLE_SPEED
+        elseif love.keyboard.isDown('s') then
+            player1.dy = PADDLE_SPEED
+        else
+            player1.dy = 0
+        end
+    --  basic ai for player 1
     else
-        player1.dy = 0
+        if ball.y > player1.y + 70 then
+            if math.random(1, 100) > 40 then
+                player1.dy = PADDLE_SPEED
+            else
+                player1.dy = 0
+            end
+        elseif ball.y > player1.y + 10 then
+            if math.random(1, 100) > 20 then
+                player1.dy = PADDLE_SPEED
+            else
+                player1.dy = 0
+            end
+        elseif ball.y < player1.y - 50 then
+            if math.random(1, 100) > 40 then
+                player1.dy = -math.random(0, 1) * PADDLE_SPEED
+            else
+                player1.dy = 0
+            end
+        elseif ball.y < player1.y + 10 - math.random(1,10) then
+            if math.random(1, 100) > 20 then
+                player1.dy = -PADDLE_SPEED
+            else
+                player1.dy = 0
+            end
+        else
+            if math.random(1, math.sqrt(ball.dx * ball.dx + ball.dy * ball.dy)) < 40 then
+                player1.dy = 0
+            else
+                player1.dy = math.floor(math.random(-1, 1)) * PADDLE_SPEED / 8
+            end
+        end
     end
 
+
     -- player 2 movement
-    if love.keyboard.isDown('up') then
-        player2.dy = -PADDLE_SPEED
-    elseif love.keyboard.isDown('down') then
-        player2.dy = PADDLE_SPEED
+    if ai_2_enabled == false then
+        if love.keyboard.isDown('up') then
+            player2.dy = -PADDLE_SPEED
+        elseif love.keyboard.isDown('down') then
+            player2.dy = PADDLE_SPEED
+        else
+            player2.dy = 0
+        end
+    --  basic ai
     else
-        player2.dy = 0
+        if ball.y > player2.y + 70 then
+            if math.random(1, 100) > 40 then
+                player2.dy = PADDLE_SPEED
+            else
+                player2.dy = 0
+            end
+        elseif ball.y > player2.y + 10 then
+            if math.random(1, 100) > 20 then
+                player2.dy = PADDLE_SPEED
+            else
+                player2.dy = 0
+            end
+        elseif ball.y < player2.y - 50 then
+            if math.random(1, 100) > 40 then
+                player2.dy = -math.random(0, 1) * PADDLE_SPEED
+            else
+                player2.dy = 0
+            end
+        elseif ball.y < player2.y + 10 - math.random(1,10) then
+            if math.random(1, 100) > 20 then
+                player2.dy = -PADDLE_SPEED
+            else
+                player2.dy = 0
+            end
+        else
+            if math.random(1, math.sqrt(ball.dx * ball.dx + ball.dy * ball.dy)) < 40 then
+                player2.dy = 0
+            else
+                player2.dy = math.floor(math.random(-1, 1)) * PADDLE_SPEED / 8
+            end
+        end
     end
 
     -- update our ball based on its DX and DY only if we're in play state;
@@ -266,6 +339,18 @@ function love.keypressed(key)
                 servingPlayer = 1
             end
         end
+    elseif key == 'h' then
+        if ai_1_enabled then
+            ai_1_enabled = false
+        else
+            ai_1_enabled = true
+        end
+    elseif key == 'j' then
+        if ai_2_enabled then
+            ai_2_enabled = false
+        else
+            ai_2_enabled = true
+        end
     end
 end
 
@@ -289,6 +374,7 @@ function love.draw()
         love.graphics.setFont(smallFont)
         love.graphics.printf('Welcome to Pong!', 0, 10, VIRTUAL_WIDTH, 'center')
         love.graphics.printf('Press Enter to begin!', 0, 20, VIRTUAL_WIDTH, 'center')
+        love.graphics.printf('Press h or j to enable ai for player 1 or 2 !', 0, 30, VIRTUAL_WIDTH, 'center')
     elseif gameState == 'serve' then
         love.graphics.setFont(smallFont)
         love.graphics.printf('Player ' .. tostring(servingPlayer) .. "'s serve!", 
