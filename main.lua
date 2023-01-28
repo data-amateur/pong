@@ -339,6 +339,7 @@ function love.keypressed(key)
                 servingPlayer = 1
             end
         end
+    -- enable/disable ai for each player
     elseif key == 'h' then
         if ai_1_enabled then
             ai_1_enabled = false
